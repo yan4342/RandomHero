@@ -14,15 +14,20 @@
 - 点击 Ban 位可打开英雄选择器，支持搜索
 - 已 Ban 的英雄不会出现在随机结果中
   ![Screenshot_20260515_224006.png](assets/Screenshot_20260515_224006.png)
+
 ### 🔄 重新Roll点
 - 对随机结果不满意？可以单独重新 Roll 某一个位置的英雄
-![Screenshot_20260515_224026.png](assets/Screenshot_20260515_224026.png)
+![Screenshot_20260515_223928.png](assets/Screenshot_20260515_223928.png)
+
 ### 📸 结果分享
 - 一键生成精美的阵容结果图，长按分享按钮进入分享页
 - 支持直接分享到社交应用
 ![Screenshot_20260515_224052.png](assets/Screenshot_20260515_224052.png)
+
 ### 设置页
 - 自定义英雄分路配置，新增英雄
+![Screenshot_20260515_224026.png](assets/Screenshot_20260515_224026.png)
+
 ### 🌙 深色模式
 - 自动跟随系统深色/浅色主题
 
