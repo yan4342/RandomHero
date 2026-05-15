@@ -55,8 +55,6 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -65,30 +63,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
-import com.example.random.R
 import com.example.random.data.HeroRepository
 import com.example.random.model.Hero
 import com.example.random.model.HeroCombo
 import com.example.random.model.ShareResultData
 import com.example.random.model.TeamSlot
 import com.example.random.ui.components.HeroAvatar
+import com.example.random.ui.theme.*
 import java.io.File
 import java.io.FileOutputStream
-
-
-
-// ── Color Palette (matches TeamRoomScreen style) ───────────────────────────────
-private val BgTop = Color(0xFF1F4D7A)
-private val BgBottom = Color(0xFF2A6AA3)
-private val PanelBg = Color(0xFF103A63)
-private val PanelBorder = Color(0xFF2E86C1)
-private val GoldAccent = Color(0xFFF0C15C)
-private val TextWhite = Color.White
-private val TextMuted = Color(0xFFB9D5EE)
-private val TeamABlue = Color(0xFF4DA6FF)
-private val TeamBRed = Color(0xFFFF5C5C)
-private val BanRed = Color(0xFFFF3B30)
-private val FzmeiheiFont = FontFamily(Font(R.font.fzmh))
 
 // ── Main Share Result Screen (横屏布局, 参考 TeamRoomScreen 风格) ──────────────
 
@@ -112,7 +95,7 @@ fun ShareResultScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(
-                brush = Brush.verticalGradient(listOf(BgTop, BgBottom))
+                brush = Brush.verticalGradient(listOf(GradientTop, GradientBottom))
             )
     ) {
         // Subtle star-like dots (same as TeamRoomScreen)
@@ -146,14 +129,14 @@ fun ShareResultScreen(
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "返回",
-                                tint = TextWhite
+                                tint = TextOnDark
                             )
                         }
                         Spacer(modifier = Modifier.width(4.dp))
                         Column {
                             Text(
                                 text = "5v5 英雄抽取",
-                                color = TextWhite,
+                                color = TextOnDark,
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
                             )
@@ -243,7 +226,7 @@ private fun BanCollapsedTab(
                 brush = Brush.verticalGradient(
                     colors = listOf(
                         Color(0xDD2F86C8),
-                        BgTop
+                        GradientTop
                     )
                 )
             )
@@ -264,7 +247,7 @@ private fun BanCollapsedTab(
     ) {
         Text(
             text = if (expanded) "›" else "‹",
-            color = TextWhite.copy(alpha = 0.9f),
+            color = TextOnDark.copy(alpha = 0.9f),
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.align(Alignment.CenterStart)
@@ -282,7 +265,7 @@ private fun BanCollapsedTab(
             )
             Text(
                 text = "Ban位",
-                color = TextWhite,
+                color = TextOnDark,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold
             )
@@ -307,7 +290,7 @@ private fun BanExpandedPanel(slots: List<Hero?>) {
             .drawBehind {
                 drawRect(
                     brush = Brush.verticalGradient(
-                        colors = listOf(Color.Transparent, BgTop),
+                        colors = listOf(Color.Transparent, GradientTop),
                         startY = size.height * 0.5f,
                         endY = size.height
                     )
@@ -528,7 +511,7 @@ private fun HeroAvatarCard(
         // 英雄名字
         Text(
             text = displayName,
-            color = if (comboForHero != null) Color(AndroidColor.parseColor(comboForHero.borderColor)) else TextWhite,
+            color = if (comboForHero != null) Color(AndroidColor.parseColor(comboForHero.borderColor)) else TextOnDark,
             fontSize = 11.sp,
             fontWeight = if (comboForHero != null) FontWeight.Bold else FontWeight.SemiBold,
             maxLines = 1,
@@ -661,14 +644,6 @@ private fun LockScreenOrientation(orientation: Int) {
 }
 
 // ── Screenshot Capture & Share ──────────────────────────────────────────────────
-
-private fun cleanOldShareFiles(context: Context) {
-    context.cacheDir.listFiles()?.forEach { file ->
-        if (file.name.startsWith("share_result_") && file.name.endsWith(".png")) {
-            file.delete()
-        }
-    }
-}
 
 private fun captureAndShare(view: View, context: Context) {
     cleanOldShareFiles(context)

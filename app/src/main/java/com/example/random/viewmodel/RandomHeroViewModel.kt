@@ -13,10 +13,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+enum class GameMode { ROLE_BASED, RANDOM }
+
 class RandomHeroViewModel : ViewModel() {
-    
-    private val _mode = MutableStateFlow("role") // 'role' or 'random'
-    val mode: StateFlow<String> = _mode.asStateFlow()
+
+    private val _mode = MutableStateFlow(GameMode.ROLE_BASED)
+    val mode: StateFlow<GameMode> = _mode.asStateFlow()
     
     private val _teamA = MutableStateFlow<List<TeamSlot>>(emptyList())
     val teamA: StateFlow<List<TeamSlot>> = _teamA.asStateFlow()
@@ -55,7 +57,7 @@ class RandomHeroViewModel : ViewModel() {
         randomize()
     }
     
-    fun setMode(newMode: String) {
+    fun setMode(newMode: GameMode) {
         _mode.value = newMode
         randomize()
     }
@@ -112,20 +114,32 @@ class RandomHeroViewModel : ViewModel() {
         // 作为备用，返回最后一个英雄
         return weightedHeroes.last().first
     }
-    
+
+    private fun buildTeamSlot(positionName: String, hero: Hero?): TeamSlot {
+        return TeamSlot(
+            positionName = positionName,
+            name = hero?.cname ?: "无英雄",
+            avatarUrl = hero?.let { HeroRepository.getHeroAvatarUrl(it.ename) } ?: "",
+            ename = hero?.ename ?: 0
+        )
+    }
+
+    private fun collectUsedEnames(): MutableSet<Int> {
+        val usedEnames = mutableSetOf<Int>()
+        _banList.value.forEach { hero -> hero?.ename?.let { usedEnames.add(it) } }
+        _teamA.value.forEach { slot -> if (slot.ename != 0) usedEnames.add(slot.ename) }
+        _teamB.value.forEach { slot -> if (slot.ename != 0) usedEnames.add(slot.ename) }
+        return usedEnames
+    }
+
     fun randomize() {
         viewModelScope.launch {
             val allHeroes = HeroRepository.heroList
-            val usedEnames = mutableSetOf<Int>()
-            
-            // Add banned heroes to used set
-            _banList.value.forEach { hero ->
-                hero?.ename?.let { usedEnames.add(it) }
-            }
-            
+            val usedEnames = collectUsedEnames()
+
             val teamA = mutableListOf<TeamSlot>()
             val teamB = mutableListOf<TeamSlot>()
-            
+
             val getRandomHero = { filterFn: ((Hero) -> Boolean)? ->
                 val available = allHeroes.filter { hero ->
                     !usedEnames.contains(hero.ename) && (filterFn?.invoke(hero) ?: true)
@@ -133,8 +147,8 @@ class RandomHeroViewModel : ViewModel() {
                 if (available.isEmpty()) null
                 else available.random().also { usedEnames.add(it.ename) }
             }
-            
-            if (_mode.value == "role") {
+
+            if (_mode.value == GameMode.ROLE_BASED) {
                 Hero.POSITIONS.forEach { position ->
                     // Team A - 使用优先级选择
                     val availableForTeamA = allHeroes.filter { hero ->
@@ -144,15 +158,8 @@ class RandomHeroViewModel : ViewModel() {
                     if (heroA != null) {
                         usedEnames.add(heroA.ename)
                     }
-                    teamA.add(
-                        TeamSlot(
-                            positionName = position.name,
-                            name = heroA?.cname ?: "无英雄",
-                            avatarUrl = heroA?.let { HeroRepository.getHeroAvatarUrl(it.ename) } ?: "",
-                            ename = heroA?.ename ?: 0
-                        )
-                    )
-                    
+                    teamA.add(buildTeamSlot(position.name, heroA))
+
                     // Team B - 使用优先级选择
                     val availableForTeamB = allHeroes.filter { hero ->
                         !usedEnames.contains(hero.ename)
@@ -161,40 +168,19 @@ class RandomHeroViewModel : ViewModel() {
                     if (heroB != null) {
                         usedEnames.add(heroB.ename)
                     }
-                    teamB.add(
-                        TeamSlot(
-                            positionName = position.name,
-                            name = heroB?.cname ?: "无英雄",
-                            avatarUrl = heroB?.let { HeroRepository.getHeroAvatarUrl(it.ename) } ?: "",
-                            ename = heroB?.ename ?: 0
-                        )
-                    )
+                    teamB.add(buildTeamSlot(position.name, heroB))
                 }
             } else {
                 // Random mode
                 repeat(5) { index ->
                     val heroA = getRandomHero(null)
-                    teamA.add(
-                        TeamSlot(
-                            positionName = "位置 ${index + 1}",
-                            name = heroA?.cname ?: "无英雄",
-                            avatarUrl = heroA?.let { HeroRepository.getHeroAvatarUrl(it.ename) } ?: "",
-                            ename = heroA?.ename ?: 0
-                        )
-                    )
-                    
+                    teamA.add(buildTeamSlot("位置 ${index + 1}", heroA))
+
                     val heroB = getRandomHero(null)
-                    teamB.add(
-                        TeamSlot(
-                            positionName = "位置 ${index + 1}",
-                            name = heroB?.cname ?: "无英雄",
-                            avatarUrl = heroB?.let { HeroRepository.getHeroAvatarUrl(it.ename) } ?: "",
-                            ename = heroB?.ename ?: 0
-                        )
-                    )
+                    teamB.add(buildTeamSlot("位置 ${index + 1}", heroB))
                 }
             }
-            
+
             _teamA.value = teamA
             _teamB.value = teamB
             detectActiveCombos()
@@ -280,26 +266,17 @@ class RandomHeroViewModel : ViewModel() {
     fun reRollOne(team: String, index: Int) {
         viewModelScope.launch {
             val allHeroes = HeroRepository.heroList
-            val usedEnames = mutableSetOf<Int>()
-            
-            // Add banned heroes
-            _banList.value.forEach { hero ->
-                hero?.ename?.let { usedEnames.add(it) }
-            }
-            
-            // Add current teams
-            _teamA.value.forEach { slot -> if (slot.ename != 0) usedEnames.add(slot.ename) }
-            _teamB.value.forEach { slot -> if (slot.ename != 0) usedEnames.add(slot.ename) }
+            val usedEnames = collectUsedEnames()
 
             val isTeamA = team == "A"
             val currentTeam = if (isTeamA) _teamA.value else _teamB.value
             val targetSlot = currentTeam[index]
-            
+
             // Remove current slot's hero from used set so it can be re-rolled to someone else
             // but we want a NEW hero, so we keep it in usedEnames to avoid rolling it again.
             // Also, we want to check if the hero is banned or already in the team.
             var newHero: Hero? = null
-            if (_mode.value == "role") {
+            if (_mode.value == GameMode.ROLE_BASED) {
                 val posName = targetSlot.positionName
                 val posDef = Hero.POSITIONS.find { it.name == posName }
                 if (posDef != null) {
@@ -314,13 +291,8 @@ class RandomHeroViewModel : ViewModel() {
             }
 
             if (newHero != null) {
-                val newSlot = TeamSlot(
-                    positionName = targetSlot.positionName,
-                    name = newHero.cname,
-                    avatarUrl = HeroRepository.getHeroAvatarUrl(newHero.ename),
-                    ename = newHero.ename
-                )
-                
+                val newSlot = buildTeamSlot(targetSlot.positionName, newHero)
+
                 if (isTeamA) {
                     val newList = _teamA.value.toMutableList()
                     newList[index] = newSlot
@@ -348,7 +320,7 @@ class RandomHeroViewModel : ViewModel() {
     
     fun getShareData(): ShareResultData {
         return ShareResultData(
-            mode = _mode.value,
+            mode = if (_mode.value == GameMode.ROLE_BASED) "role" else "random",
             teamA = _teamA.value,
             teamB = _teamB.value,
             banList = _banList.value,

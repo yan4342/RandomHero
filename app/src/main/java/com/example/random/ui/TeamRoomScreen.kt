@@ -27,14 +27,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
-private val BgTop = Color(0xFF1F4D7A)
-private val BgBottom = Color(0xFF2A6AA3)
-private val Panel = Color(0xFF103A63)
-private val PanelBorder = Color(0xFF2E86C1)
-private val Accent = Color(0xFFF0C15C)
-private val TextPrimary = Color.White
-private val TextSecondary = Color(0xFFB9D5EE)
+import com.example.random.ui.theme.*
 
 @Preview(
     showBackground = true,
@@ -59,7 +52,7 @@ fun TeamRoomScreen(
             .fillMaxSize()
             .background(
                 brush = Brush.verticalGradient(
-                    colors = listOf(BgTop, BgBottom)
+                    colors = listOf(GradientTop, GradientBottom)
                 )
             )
     ) {
@@ -128,7 +121,7 @@ private fun TopBar(
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
                     contentDescription = "返回",
-                    tint = TextPrimary
+                    tint = TextOnDark
                 )
             }
 
@@ -138,7 +131,7 @@ private fun TopBar(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = roomTitle,
-                        color = TextPrimary,
+                        color = TextOnDark,
                         fontSize = 23.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -146,14 +139,14 @@ private fun TopBar(
                     Icon(
                         imageVector = Icons.Filled.Home,
                         contentDescription = "主页",
-                        tint = TextSecondary,
+                        tint = TextMuted,
                         modifier = Modifier.size(20.dp)
                     )
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = serverName,
-                    color = TextSecondary,
+                    color = TextMuted,
                     fontSize = 14.sp
                 )
             }
@@ -166,13 +159,13 @@ private fun TopBar(
             Column(horizontalAlignment = Alignment.End) {
                 Text(
                     text = spectatorCount,
-                    color = TextSecondary,
+                    color = TextMuted,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = "观战席",
-                    color = TextPrimary,
+                    color = TextOnDark,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -252,7 +245,7 @@ private fun SeatCard(
                 is SeatState.Occupied -> seatState.name
                 SeatState.Empty -> ""
             },
-            color = TextPrimary,
+            color = TextOnDark,
             fontSize = 14.sp,
             fontWeight = FontWeight.SemiBold,
             maxLines = 1,
@@ -284,7 +277,7 @@ private fun OccupiedSeatAvatar(name: String) {
 
         Text(
             text = name,
-            color = TextPrimary,
+            color = TextOnDark,
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             maxLines = 1,
