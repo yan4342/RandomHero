@@ -1,0 +1,44 @@
+[
+  {
+    "name": "长城守卫军",
+    "heroIds": [154, 193, 196, 195, 194],
+    "minRequired": 3,
+    "borderColor": "#4A90E2"
+  },
+  {
+    "name": "五虎上将",
+    "heroIds": [140, 171, 107, 518, 192],
+    "minRequired": 3,
+    "borderColor": "#C41E3A"
+  },
+  {
+    "name": "陨落的天才",
+    "heroIds": [544, 538],
+    "minRequired": 2,
+    "borderColor": "#FF69B4"
+  },
+  {
+    "name": "宗教胜利",
+    "heroIds": [108, 537, 141, 531, 518, 523],
+    "minRequired": 4,
+    "borderColor": "#4A90E2"
+  },
+  {
+    "name": "哈~",
+    "heroIds": [502, 312],
+    "minRequired": 2,
+    "borderColor": "#FFD700"
+  },
+  {
+    "name": "马，瑶",
+    "heroIds": [132, 505],
+    "minRequired": 2,
+    "borderColor": "#FFD700"
+  },
+  {
+    "name": "三分天下",
+    "heroIds": [170, 128, 151, 510],
+    "minRequired": 3,
+    "borderColor": "#FFD700"
+  }
+]

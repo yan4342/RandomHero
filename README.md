@@ -13,14 +13,16 @@
 - 支持最多 **8 个 Ban 位**
 - 点击 Ban 位可打开英雄选择器，支持搜索
 - 已 Ban 的英雄不会出现在随机结果中
-
+  ![Screenshot_20260515_224006.png](assets/Screenshot_20260515_224006.png)
 ### 🔄 重新Roll点
 - 对随机结果不满意？可以单独重新 Roll 某一个位置的英雄
-
+![Screenshot_20260515_224026.png](assets/Screenshot_20260515_224026.png)
 ### 📸 结果分享
-- 一键生成精美的阵容结果图
+- 一键生成精美的阵容结果图，长按分享按钮进入分享页
 - 支持直接分享到社交应用
-
+![Screenshot_20260515_224052.png](assets/Screenshot_20260515_224052.png)
+### 设置页
+- 自定义英雄分路配置，新增英雄
 ### 🌙 深色模式
 - 自动跟随系统深色/浅色主题
 
@@ -87,19 +89,16 @@ cd random
 
 ## 🔧 辅助脚本
 
-项目根目录包含两个用于处理英雄数据的辅助脚本：
 
 | 脚本 | 说明 |
 |------|------|
 | herolist.js | 英雄数据源（JSON 格式），来源于[王者荣耀官网](https://pvp.qq.com/web201605/js/herolist.json) |
-| convert_hero.py | 将 herolist.js 中的 JSON 数据转换为 Kotlin `Hero(...)` 构造代码 |
-| extract_missing_heroes.ps1 | PowerShell 脚本，用于提取缺失的英雄数据 |
+
 
 ### 更新英雄数据
 1. 从王者荣耀官网获取最新的 `herolist.json`
-2. 将数据保存为 `input.txt`
-3. 运行 `python convert_hero.py` 生成 `output.txt`
-4. 将输出结果更新到 HeroRepository.kt 中
+2. 将输出结果更新到 `heros.json` 中
+3. 设置页z可以自定义英雄分路配置，新增英雄
 
 ## 📊 数据来源
 

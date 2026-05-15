@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -31,6 +32,7 @@ fun RandomHeroApp() {
     val showShareScreen by viewModel.showShareScreen.collectAsState()
     val expandBanBar by viewModel.expandBanBar.collectAsState()
     val autoShare by viewModel.autoShare.collectAsState()
+    val showSettings by viewModel.showSettings.collectAsState()
     val haptic = LocalHapticFeedback.current
     val context = LocalContext.current
 
@@ -41,6 +43,14 @@ fun RandomHeroApp() {
             captureShareInBackground(context, viewModel.getShareData())
             viewModel.closeShareScreen()
         }
+    }
+
+    // Navigate to settings screen
+    if (showSettings) {
+        SettingsScreen(
+            onBackClick = { viewModel.closeSettings() }
+        )
+        return
     }
 
     // Navigate to share screen (view mode)
@@ -65,8 +75,28 @@ fun RandomHeroApp() {
                 .padding(10.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Mode Selection
-            ModeSelector(viewModel)
+            Spacer(modifier = Modifier.height(5.dp))
+
+            // Top bar: Mode Selection + Settings icon
+            Box(modifier = Modifier.fillMaxWidth()) {
+                ModeSelector(viewModel)
+                // Settings icon in top-right corner
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .noRippleClickable { viewModel.openSettings() },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Settings,
+                        contentDescription = "设置",
+                        modifier = Modifier.size(22.dp),
+                        tint = appColors.textSub
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.height(15.dp))
 

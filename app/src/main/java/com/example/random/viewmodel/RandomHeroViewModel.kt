@@ -52,6 +52,9 @@ class RandomHeroViewModel : ViewModel() {
 
     private val _autoShare = MutableStateFlow(false)
     val autoShare: StateFlow<Boolean> = _autoShare.asStateFlow()
+
+    private val _showSettings = MutableStateFlow(false)
+    val showSettings: StateFlow<Boolean> = _showSettings.asStateFlow()
     
     init {
         randomize()
@@ -326,5 +329,17 @@ class RandomHeroViewModel : ViewModel() {
             banList = _banList.value,
             activeCombos = _activeCombos.value
         )
+    }
+
+    // ── 设置页 ──────────────────────────────────────────────────────
+
+    fun openSettings() {
+        _showSettings.value = true
+    }
+
+    fun closeSettings() {
+        _showSettings.value = false
+        // 设置页关闭后重新抽取，使用可能已更新的英雄数据
+        randomize()
     }
 }

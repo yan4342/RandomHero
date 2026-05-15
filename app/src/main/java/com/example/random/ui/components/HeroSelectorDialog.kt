@@ -41,7 +41,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.runtime.derivedStateOf
 
 // 分页配置
-private const val PAGE_SIZE = 30 // 每页加载数量
+private const val PAGE_SIZE = 35 // 每页加载数量
 private const val LOAD_MORE_THRESHOLD = 6 // 距离底部多少项时触发加载
 
 @Composable
