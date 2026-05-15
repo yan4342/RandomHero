@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -37,6 +38,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.runtime.derivedStateOf
+
+// 分页配置
+private const val PAGE_SIZE = 30 // 每页加载数量
+private const val LOAD_MORE_THRESHOLD = 6 // 距离底部多少项时触发加载
 
 @Composable
 fun HeroSelectorDialog(
@@ -58,6 +64,25 @@ fun HeroSelectorDialog(
             }
         }
         result
+    }
+    
+    // 分页状态
+    var displayedCount by remember { mutableIntStateOf(PAGE_SIZE) }
+    var isLoadingMore by remember { mutableStateOf(false) }
+    
+    // 当筛选条件变化时重置分页
+    LaunchedEffect(searchText, selectedRole) {
+        displayedCount = PAGE_SIZE
+    }
+    
+    // 当前显示的英雄列表（分页截取）
+    val displayedHeroes = remember(filteredHeroes, displayedCount) {
+        filteredHeroes.take(displayedCount)
+    }
+    
+    // 是否还有更多数据
+    val hasMore = remember(filteredHeroes, displayedCount) {
+        displayedCount < filteredHeroes.size
     }
     
     val isDark = isSystemInDarkTheme()
@@ -174,17 +199,36 @@ fun HeroSelectorDialog(
                 
                 Spacer(modifier = Modifier.height(10.dp))
                 
-                // Hero Grid
+                // Hero Grid with pagination
+                val gridState = rememberLazyGridState()
+                
+                // 检测是否需要加载更多
+                val shouldLoadMore by remember {
+                    derivedStateOf {
+                        val lastVisibleItem = gridState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+                        lastVisibleItem >= (displayedCount - LOAD_MORE_THRESHOLD) && hasMore && !isLoadingMore
+                    }
+                }
+                
+                // 触发加载更多
+                LaunchedEffect(shouldLoadMore) {
+                    if (shouldLoadMore) {
+                        isLoadingMore = true
+                        displayedCount = (displayedCount + PAGE_SIZE).coerceAtMost(filteredHeroes.size)
+                        isLoadingMore = false
+                    }
+                }
+                
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(5), // 使用固定列数减少计算
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     contentPadding = PaddingValues(5.dp),
-                    state = rememberLazyGridState()
+                    state = gridState
                 ) {
                     items(
-                        items = filteredHeroes,
+                        items = displayedHeroes,
                         key = { it.ename },
                         contentType = { "hero" } // 提示 Compose 这里的项类型相同，优化重用
                     ) { hero ->
@@ -193,6 +237,27 @@ fun HeroSelectorDialog(
                             onClick = { onHeroSelected(hero) },
                             avatarBg = avatarBg
                         )
+                    }
+                    
+                    // 底部加载指示器
+                    if (isLoadingMore) {
+                        item(
+                            span = { GridItemSpan(maxLineSpan) },
+                            contentType = "loading"
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(24.dp),
+                                    strokeWidth = 2.dp,
+                                    color = selectedBgColor
+                                )
+                            }
+                        }
                     }
                 }
             }
