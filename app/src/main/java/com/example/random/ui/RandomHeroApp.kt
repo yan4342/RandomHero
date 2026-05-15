@@ -198,6 +198,9 @@ fun RandomHeroApp() {
             }
 
             Spacer(modifier = Modifier.height(20.dp))
+
+            // Bottom padding for navigation bar
+            Spacer(modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars))
         }
 
         // Hero Selector Modal
