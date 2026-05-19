@@ -29,24 +29,23 @@ fun BanSection(viewModel: RandomHeroViewModel, activeCombos: List<HeroCombo> = e
 
     Card(
         colors = CardDefaults.cardColors(containerColor = appColors.card),
-        elevation = CardDefaults.cardElevation(defaultElevation = if (appColors.isDark) 0.dp else 2.dp),
-        shape = RoundedCornerShape(5.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = if (appColors.isDark) 0.dp else 1.dp),
+        shape = appColors.cardShape,
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 "Ban位",
                 color = BanColor,
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp,
+                style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
             // Grid of 8 slots (4x2)
-            Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 repeat(2) { row ->
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -92,16 +91,16 @@ fun BanSlot(
             .noRippleClickable { onSelect() }
     ) {
         Box(
-            modifier = Modifier.size(42.dp),
+            modifier = Modifier.size(46.dp),
             contentAlignment = Alignment.TopEnd
         ) {
             // Avatar Wrapper
             Box(
                 modifier = Modifier
-                    .size(40.dp)
-                    .clip(RoundedCornerShape(5.dp))
+                    .size(44.dp)
+                    .clip(RoundedCornerShape(10.dp))
                     .background(appColors.avatarBg)
-                    .border(1.dp, borderColor, RoundedCornerShape(5.dp)),
+                    .border(1.dp, borderColor, RoundedCornerShape(10.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 if (hero != null) {
@@ -119,9 +118,9 @@ fun BanSlot(
                 Box(
                     modifier = Modifier
                         .offset(x = 4.dp, y = (-4).dp)
-                        .size(18.dp)
+                        .size(20.dp)
                         .clip(CircleShape)
-                        .background(BanColor)
+                        .background(BanColor.copy(alpha = 0.85f))
                         .noRippleClickable { onRemove() },
                     contentAlignment = Alignment.Center
                 ) {
@@ -132,7 +131,7 @@ fun BanSlot(
 
         Text(
             text = displayName,
-            fontSize = 11.sp,
+            style = MaterialTheme.typography.labelSmall,
             color = appColors.textSub,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,

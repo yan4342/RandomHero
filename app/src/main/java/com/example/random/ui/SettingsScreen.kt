@@ -3,22 +3,23 @@ package com.example.random.ui
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.example.random.R
 import com.example.random.data.HeroDataSource
 import com.example.random.data.HeroRepository
 import com.example.random.model.Hero
@@ -84,132 +85,168 @@ fun SettingsScreen(
             title = {
                 Text(
                     "英雄分路设置",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
+                    style = MaterialTheme.typography.headlineMedium,
                     color = appColors.textMain
                 )
             },
             navigationIcon = {
                 IconButton(onClick = onBackClick) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack,
+                    Image(
+                        painter = painterResource(id = R.drawable.back_button),
                         contentDescription = "返回",
-                        tint = appColors.textMain
+                        modifier = Modifier.size(24.dp)
                     )
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = appColors.card
+                containerColor = appColors.bg
             )
         )
 
-        // ── 主体区域 ──────────────────────────────────────────────────────
+        // ── 可滚动主体 ──────────────────────────────────────────────────
         Column(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text(
-                "点击下方按钮选择要编辑分路的英雄",
-                fontSize = 14.sp,
-                color = appColors.textSub
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = { showHeroSelector = true },
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = appColors.gold,
-                    contentColor = appColors.darkText
+            // ── 主操作卡片：选择英雄 ──────────────────────────────────────
+            Card(
+                colors = CardDefaults.cardColors(containerColor = appColors.card),
+                shape = appColors.cardShape,
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = if (appColors.isDark) 0.dp else 1.dp
                 ),
-                modifier = Modifier
-                    .fillMaxWidth(0.7f)
-                    .height(48.dp)
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text("选择英雄", fontSize = 16.sp, fontWeight = FontWeight.Medium)
-            }
-        }
-
-        // ── 底部操作栏 ──────────────────────────────────────────────────────
-        Card(
-            colors = CardDefaults.cardColors(containerColor = appColors.card),
-            shape = RoundedCornerShape(0.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = if (appColors.isDark) 0.dp else 2.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .navigationBarsPadding()
-                    .padding(horizontal = 12.dp, vertical = 10.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                // 第一行：添加 + 恢复默认
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    OutlinedButton(
-                        onClick = { showAddDialog = true },
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = appColors.textMain)
-                    ) {
-                        Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("添加英雄", fontSize = 14.sp)
-                    }
+                    Text(
+                        "选择英雄编辑分路",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = appColors.textMain
+                    )
 
-                    OutlinedButton(
-                        onClick = { showResetConfirm = true },
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = BanColor)
-                    ) {
-                        Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("恢复默认", fontSize = 14.sp)
-                    }
-                }
+                    Spacer(modifier = Modifier.height(6.dp))
 
-                // 第二行：导入 + 导出
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    OutlinedButton(
-                        onClick = {
-                            importLauncher.launch(arrayOf("application/json"))
-                        },
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = appColors.textMain)
-                    ) {
-                        Text("导入配置", fontSize = 14.sp)
-                    }
+                    Text(
+                        "点击下方按钮选择英雄，支持搜索和按分路筛选",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = appColors.textSub
+                    )
 
-                    OutlinedButton(
-                        onClick = {
-                            exportLauncher.launch("hero_config.json")
-                        },
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = appColors.textMain)
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Button(
+                        onClick = { showHeroSelector = true },
+                        shape = appColors.buttonShape,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = appColors.gold,
+                            contentColor = appColors.darkText
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth(0.7f)
+                            .height(48.dp)
                     ) {
-                        Text("导出配置", fontSize = 14.sp)
+                        Text("选择英雄", style = MaterialTheme.typography.labelLarge)
                     }
                 }
             }
+
+            // ── 数据管理卡片 ──────────────────────────────────────────────
+            Card(
+                colors = CardDefaults.cardColors(containerColor = appColors.card),
+                shape = appColors.cardShape,
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = if (appColors.isDark) 0.dp else 1.dp
+                ),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        "数据管理",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = appColors.textMain,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+
+                    // 第一行：添加 + 恢复默认
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedButton(
+                            onClick = { showAddDialog = true },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = appColors.textMain)
+                        ) {
+                            Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("添加英雄", style = MaterialTheme.typography.labelLarge)
+                        }
+
+                        OutlinedButton(
+                            onClick = { showResetConfirm = true },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = BanColor)
+                        ) {
+                            Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("恢复默认", style = MaterialTheme.typography.labelLarge)
+                        }
+                    }
+
+                    // 第二行：导入 + 导出
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedButton(
+                            onClick = { importLauncher.launch(arrayOf("application/json")) },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = appColors.textMain)
+                        ) {
+                            Text("导入配置", style = MaterialTheme.typography.labelLarge)
+                        }
+
+                        OutlinedButton(
+                            onClick = { exportLauncher.launch("hero_config.json") },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = appColors.textMain)
+                        ) {
+                            Text("导出配置", style = MaterialTheme.typography.labelLarge)
+                        }
+                    }
+                }
+            }
+
+            // ── 预留扩展空间 ──────────────────────────────────────────────
+            // 未来可在此处添加更多设置卡片
+
+            Spacer(modifier = Modifier.height(4.dp))
         }
+
+        // 底部安全区域
+        Spacer(modifier = Modifier.navigationBarsPadding())
     }
 
     // ── 编辑弹窗 ──────────────────────────────────────────────────────
     if (showEditDialog && editingHero != null) {
-        // 从最新 heroes 列表中查找，确保弹窗显示的是最新数据
         val currentHero = heroes.find { it.ename == editingHero!!.ename }
         if (currentHero != null) {
             HeroEditDialog(
@@ -279,7 +316,7 @@ fun SettingsScreen(
         )
     }
 
-    // ── 英雄选择器弹窗（复用 HeroSelectorDialog） ──────────────────────
+    // ── 英雄选择器弹窗 ──────────────────────────────────────────────────
     if (showHeroSelector) {
         HeroSelectorDialog(
             heroes = heroes,

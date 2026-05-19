@@ -44,7 +44,7 @@ fun HeroEditDialog(
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(16.dp),
             color = appColors.card,
             modifier = Modifier.fillMaxWidth(0.92f)
         ) {
@@ -62,14 +62,13 @@ fun HeroEditDialog(
 
                 Text(
                     hero.cname,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.headlineMedium,
                     color = appColors.textMain
                 )
 
                 Text(
                     hero.title,
-                    fontSize = 13.sp,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = appColors.textSub
                 )
 
@@ -123,20 +122,20 @@ fun HeroEditDialog(
                     OutlinedButton(
                         onClick = { showDeleteConfirm = true },
                         modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(8.dp),
+                        shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = BanColor)
                     ) {
-                        Text("删除", fontSize = 14.sp)
+                        Text("删除", style = MaterialTheme.typography.labelLarge)
                     }
 
                     // 取消按钮
                     OutlinedButton(
                         onClick = onDismiss,
                         modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(8.dp),
+                        shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = appColors.textSub)
                     ) {
-                        Text("取消", fontSize = 14.sp)
+                        Text("取消", style = MaterialTheme.typography.labelLarge)
                     }
 
                     // 保存按钮
@@ -150,13 +149,13 @@ fun HeroEditDialog(
                             onSave(updated)
                         },
                         modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(8.dp),
+                        shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = appColors.gold,
                             contentColor = appColors.darkText
                         )
                     ) {
-                        Text("保存", fontSize = 14.sp)
+                        Text("保存", style = MaterialTheme.typography.labelLarge)
                     }
                 }
             }
@@ -213,21 +212,21 @@ private fun RoleSlotRow(
         ) {
             Text(
                 label,
-                fontSize = 13.sp,
+                style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
                 color = appColors.textMain
             )
             Spacer(modifier = Modifier.width(6.dp))
             Text(
                 weightLabel,
-                fontSize = 11.sp,
+                style = MaterialTheme.typography.labelSmall,
                 color = appColors.textSub
             )
             if (required) {
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
                     "必选",
-                    fontSize = 10.sp,
+                    style = MaterialTheme.typography.labelSmall,
                     color = BanColor
                 )
             }
@@ -244,7 +243,7 @@ private fun RoleSlotRow(
                 val bgColor = when {
                     isSelected -> tagColor.copy(alpha = 0.2f)
                     isOccupied -> appColors.divider.copy(alpha = 0.5f)
-                    else -> if (appColors.isDark) Color(0xFF2A2A2A) else Color(0xFFF5F5F5)
+                    else -> appColors.surfaceInput
                 }
                 val textColor = when {
                     isSelected -> tagColor
@@ -253,7 +252,7 @@ private fun RoleSlotRow(
                 }
 
                 Surface(
-                    shape = RoundedCornerShape(8.dp),
+                    shape = RoundedCornerShape(10.dp),
                     color = bgColor,
                     modifier = Modifier
                         .weight(1f)
@@ -274,8 +273,8 @@ private fun RoleSlotRow(
                     ) {
                         Text(
                             roleName,
-                            fontSize = 12.sp,
-                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                             color = textColor
                         )
                     }

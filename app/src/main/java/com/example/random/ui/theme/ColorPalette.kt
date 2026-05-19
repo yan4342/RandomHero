@@ -29,6 +29,14 @@ val DarkSubTextColor = Color(0xFF999999)
 val DarkDividerColor = Color(0xFF333333)
 val DarkAvatarBgColor = Color(0xFF2C2C2C)
 
+// ── 扁平化/极简风格表面色 ─────────────────────────────────────────────────
+val SurfaceElevatedLight = Color(0xFFFAFAFA)
+val SurfaceElevatedDark = Color(0xFF252525)
+val SurfaceInputLight = Color(0xFFF0F0F0)
+val SurfaceInputDark = Color(0xFF2A2A2A)
+val GoldMutedLight = Color(0x1ABCA676)
+val GoldMutedDark = Color(0x1ABCA676)
+
 // ── 分享/组队房间深色主题颜色 (ShareResultScreen & TeamRoomScreen) ──────────
 val GradientTop = Color(0xFF1F4D7A)
 val GradientBottom = Color(0xFF2A6AA3)

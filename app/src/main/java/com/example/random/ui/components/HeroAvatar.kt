@@ -38,7 +38,7 @@ fun HeroAvatar(
         model = request,
         contentDescription = null,
         modifier = modifier
-            .clip(RoundedCornerShape(8.dp)),
+            .clip(RoundedCornerShape(6.dp)),
         contentScale = ContentScale.Crop
     )
 }

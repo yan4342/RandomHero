@@ -54,7 +54,7 @@ fun AddHeroDialog(
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(16.dp),
             color = appColors.card,
             modifier = Modifier
                 .fillMaxWidth(0.92f)
@@ -66,8 +66,7 @@ fun AddHeroDialog(
                 // ── 标题 ──────────────────────────────────────
                 Text(
                     "添加新英雄",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.headlineMedium,
                     color = appColors.textMain,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
@@ -125,7 +124,7 @@ fun AddHeroDialog(
                     // 分路选择
                     Text(
                         "分路 *（主分路必选）",
-                        fontSize = 14.sp,
+                        style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Medium,
                         color = appColors.textMain
                     )
@@ -196,10 +195,10 @@ fun AddHeroDialog(
                     OutlinedButton(
                         onClick = onDismiss,
                         modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(8.dp),
+                        shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = appColors.textSub)
                     ) {
-                        Text("取消", fontSize = 14.sp)
+                        Text("取消", style = MaterialTheme.typography.labelLarge)
                     }
 
                     Button(
@@ -222,13 +221,13 @@ fun AddHeroDialog(
                             }
                         },
                         modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(8.dp),
+                        shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = appColors.gold,
                             contentColor = appColors.darkText
                         )
                     ) {
-                        Text("保存", fontSize = 14.sp)
+                        Text("保存", style = MaterialTheme.typography.labelLarge)
                     }
                 }
             }
@@ -252,7 +251,7 @@ private fun FormField(
     Column {
         Text(
             label,
-            fontSize = 13.sp,
+            style = MaterialTheme.typography.bodySmall,
             color = appColors.textSub,
             modifier = Modifier.padding(bottom = 4.dp)
         )
@@ -263,22 +262,19 @@ private fun FormField(
                 if (placeholder.isNotEmpty()) {
                     Text(
                         placeholder,
-                        fontSize = 14.sp,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = appColors.textSub.copy(alpha = 0.5f)
                     )
                 }
             },
-            textStyle = TextStyle(
-                fontSize = 14.sp,
-                color = appColors.textMain
-            ),
+            textStyle = MaterialTheme.typography.bodyMedium.copy(color = appColors.textMain),
             modifier = Modifier
                 .fillMaxWidth()
                 .then(if (!singleLine) Modifier.height(80.dp) else Modifier),
-            shape = RoundedCornerShape(8.dp),
+            shape = RoundedCornerShape(12.dp),
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = if (appColors.isDark) Color(0xFF2C2C2C) else Color(0xFFF5F5F5),
-                unfocusedContainerColor = if (appColors.isDark) Color(0xFF2C2C2C) else Color(0xFFF5F5F5),
+                focusedContainerColor = appColors.surfaceInput,
+                unfocusedContainerColor = appColors.surfaceInput,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 cursorColor = appColors.textMain,
@@ -291,7 +287,7 @@ private fun FormField(
         if (errorMessage != null) {
             Text(
                 errorMessage,
-                fontSize = 11.sp,
+                style = MaterialTheme.typography.labelSmall,
                 color = BanColor,
                 modifier = Modifier.padding(start = 4.dp, top = 2.dp)
             )
@@ -320,21 +316,21 @@ private fun AddHeroRoleSlot(
         ) {
             Text(
                 label,
-                fontSize = 13.sp,
+                style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
                 color = appColors.textMain
             )
             Spacer(modifier = Modifier.width(6.dp))
             Text(
                 weightLabel,
-                fontSize = 11.sp,
+                style = MaterialTheme.typography.labelSmall,
                 color = appColors.textSub
             )
             if (required) {
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
                     "必选",
-                    fontSize = 10.sp,
+                    style = MaterialTheme.typography.labelSmall,
                     color = BanColor
                 )
             }
@@ -358,7 +354,7 @@ private fun AddHeroRoleSlot(
                 val bgColor = when {
                     isSelected -> tagColor.copy(alpha = 0.2f)
                     isOccupied -> appColors.divider.copy(alpha = 0.5f)
-                    else -> if (appColors.isDark) Color(0xFF2A2A2A) else Color(0xFFF5F5F5)
+                    else -> appColors.surfaceInput
                 }
                 val textColor = when {
                     isSelected -> tagColor
@@ -367,7 +363,7 @@ private fun AddHeroRoleSlot(
                 }
 
                 Surface(
-                    shape = RoundedCornerShape(8.dp),
+                    shape = RoundedCornerShape(10.dp),
                     color = bgColor,
                     modifier = Modifier
                         .weight(1f)
@@ -387,8 +383,8 @@ private fun AddHeroRoleSlot(
                     ) {
                         Text(
                             roleName,
-                            fontSize = 12.sp,
-                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                             color = textColor
                         )
                     }

@@ -12,13 +12,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.random.R
 import com.example.random.ui.components.*
 import com.example.random.ui.theme.*
 import com.example.random.viewmodel.RandomHeroViewModel
@@ -66,24 +68,27 @@ fun RandomHeroApp() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(if (appColors.isDark) Color.Black else appColors.bg)
+            .background(appColors.bg)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(10.dp),
+                .padding(horizontal = 16.dp, vertical = 12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(5.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Top bar: Mode Selection + Settings icon
-            Box(modifier = Modifier.fillMaxWidth()) {
-                ModeSelector(viewModel)
-                // Settings icon in top-right corner
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                ModeSelector(viewModel, modifier = Modifier.weight(1f))
+                // Settings icon
                 Box(
                     modifier = Modifier
-                        .align(Alignment.CenterEnd)
                         .size(40.dp)
                         .clip(CircleShape)
                         .noRippleClickable { viewModel.openSettings() },
@@ -98,17 +103,17 @@ fun RandomHeroApp() {
                 }
             }
 
-            Spacer(modifier = Modifier.height(15.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Ban Section
             BanSection(viewModel, activeCombos)
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-            // Teams side by side - Reduced spacing
+            // Teams side by side
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 TeamColumn(
                     title = "队伍上",
@@ -129,42 +134,55 @@ fun RandomHeroApp() {
                 )
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Action Buttons
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
+                horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Randomize Button
+                // Randomize Button with button.png pattern
                 Button(
                     onClick = { viewModel.randomize() },
+                    shape = RoundedCornerShape(4.dp),
+                    contentPadding = PaddingValues(0.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = appColors.gold,
                         contentColor = appColors.darkText
                     ),
-                    shape = RoundedCornerShape(25.dp),
                     modifier = Modifier
                         .weight(1f)
-                        .height(50.dp),
-                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
+                        .height(48.dp)
                 ) {
-                    Text(
-                        "重新抽取",
-                        fontSize = 18.sp,
-                        fontFamily = FzmeiheiFont
-                    )
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.button),
+                            contentDescription = null,
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(RoundedCornerShape(4.dp))
+                        )
+                        Text(
+                            "重新抽取",
+                            style = MaterialTheme.typography.labelLarge.copy(fontSize = 18.sp),
+                            fontFamily = FzmeiheiFont
+                        )
+                    }
                 }
-
-                Spacer(modifier = Modifier.width(5.dp))
 
                 // Share Icon - click to share, long press for menu
                 var showShareMenu by remember { mutableStateOf(false) }
                 Box {
-                    Box(
+                    Surface(
+                        shape = CircleShape,
+                        color = appColors.surfaceInput,
                         modifier = Modifier
-                            .size(48.dp)
+                            .size(44.dp)
                             .clip(CircleShape)
                             .combinedClickable(
                                 onClick = { viewModel.openShareScreen(expandBan = true, autoShare = true) },
@@ -172,15 +190,16 @@ fun RandomHeroApp() {
                                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                     showShareMenu = true
                                 }
-                            ),
-                        contentAlignment = Alignment.Center
+                            )
                     ) {
-                        Icon(
-                            imageVector = Icons.Filled.Share,
-                            contentDescription = "分享",
-                            modifier = Modifier.size(24.dp),
-                            tint = appColors.textMain
-                        )
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(
+                                imageVector = Icons.Filled.Share,
+                                contentDescription = "分享",
+                                modifier = Modifier.size(22.dp),
+                                tint = appColors.textMain
+                            )
+                        }
                     }
                     DropdownMenu(
                         expanded = showShareMenu,
@@ -197,7 +216,7 @@ fun RandomHeroApp() {
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Bottom padding for navigation bar
             Spacer(modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars))

@@ -23,6 +23,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -44,6 +45,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -63,6 +66,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
+import com.example.random.R
 import com.example.random.data.HeroRepository
 import com.example.random.model.Hero
 import com.example.random.model.HeroCombo
@@ -98,6 +102,91 @@ fun ShareResultScreen(
                 brush = Brush.verticalGradient(listOf(GradientTop, GradientBottom))
             )
     ) {
+        // ── 底部白色亮光流线型花纹 (绘制在最底层，不遮挡其他内容) ──
+        Canvas(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(120.dp)
+                .align(Alignment.BottomCenter)
+        ) {
+            val w = size.width
+            val h = size.height
+
+            // 流线路径 - 3 条交错的弧线
+            val lines = listOf(
+                listOf(
+                    Offset(0f, h * 0.7f),
+                    Offset(w * 0.15f, h * 0.45f),
+                    Offset(w * 0.35f, h * 0.6f),
+                    Offset(w * 0.55f, h * 0.3f),
+                    Offset(w * 0.75f, h * 0.5f),
+                    Offset(w * 0.9f, h * 0.25f),
+                    Offset(w, h * 0.4f)
+                ),
+                listOf(
+                    Offset(0f, h * 0.85f),
+                    Offset(w * 0.2f, h * 0.55f),
+                    Offset(w * 0.4f, h * 0.7f),
+                    Offset(w * 0.6f, h * 0.4f),
+                    Offset(w * 0.8f, h * 0.6f),
+                    Offset(w, h * 0.35f)
+                ),
+                listOf(
+                    Offset(w * 0.1f, h),
+                    Offset(w * 0.25f, h * 0.65f),
+                    Offset(w * 0.45f, h * 0.8f),
+                    Offset(w * 0.65f, h * 0.5f),
+                    Offset(w * 0.85f, h * 0.7f),
+                    Offset(w, h * 0.55f)
+                )
+            )
+
+            // 绘制流线
+            for (points in lines) {
+                val path = androidx.compose.ui.graphics.Path().apply {
+                    moveTo(points[0].x, points[0].y)
+                    for (i in 1 until points.size) {
+                        val prev = points[i - 1]
+                        val curr = points[i]
+                        val cpX = (prev.x + curr.x) / 2f
+                        quadraticTo(prev.x + (curr.x - prev.x) * 0.3f, prev.y, cpX, (prev.y + curr.y) / 2f)
+                        quadraticTo(curr.x - (curr.x - prev.x) * 0.3f, curr.y, curr.x, curr.y)
+                    }
+                }
+                drawPath(
+                    path = path,
+                    color = Color.White.copy(alpha = 0.24f),
+                    style = androidx.compose.ui.graphics.drawscope.Stroke(width = 2.5f)
+                )
+            }
+
+            // 绘制断点亮点
+            val brightDots = listOf(
+                Offset(w * 0.15f, h * 0.45f),
+                Offset(w * 0.35f, h * 0.6f),
+                Offset(w * 0.75f, h * 0.5f),
+                Offset(w * 0.2f, h * 0.55f),
+                Offset(w * 0.6f, h * 0.4f),
+                Offset(w * 0.8f, h * 0.6f),
+                Offset(w * 0.65f, h * 0.5f),
+                Offset(w * 0.45f, h * 0.8f)
+            )
+            for (dot in brightDots) {
+                // 外光晕
+                drawCircle(
+                    color = Color.White.copy(alpha = 0.08f),
+                    radius = 6f,
+                    center = dot
+                )
+                // 核心亮点
+                drawCircle(
+                    color = Color.White.copy(alpha = 0.5f),
+                    radius = 2f,
+                    center = dot
+                )
+            }
+        }
+
         // Subtle star-like dots (same as TeamRoomScreen)
         Canvas(modifier = Modifier.fillMaxSize()) {
             val stepX = size.width / 14f
@@ -221,7 +310,7 @@ private fun BanCollapsedTab(
         modifier = Modifier
             .width(88.dp)
             .fillMaxHeight()
-            .clip(RoundedCornerShape(topStart = 2.dp))
+            .clip(RoundedCornerShape(topStart = 8.dp))
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
@@ -278,7 +367,7 @@ private fun BanExpandedPanel(slots: List<Hero?>) {
     Row(
         modifier = Modifier
             .fillMaxHeight()
-            .clip(RoundedCornerShape(topStart = 4.dp))
+            .clip(RoundedCornerShape(topStart = 8.dp))
             .background(
                 brush = Brush.horizontalGradient(
                     colors = listOf(
@@ -332,12 +421,12 @@ private fun BanSlotPreview(
         Box(
             modifier = Modifier
                 .size(36.dp)
-                .clip(RoundedCornerShape(4.dp))
+                .clip(RoundedCornerShape(6.dp))
                 .background(Color(0xFF0A1F3A).copy(alpha = 0.86f))
                 .border(
                     width = 1.dp,
                     color = if (hero != null) BanRed.copy(alpha = 0.7f) else PanelBorder.copy(alpha = 0.55f),
-                    shape = RoundedCornerShape(4.dp)
+                    shape = RoundedCornerShape(6.dp)
                 ),
             contentAlignment = Alignment.Center
         ) {
@@ -361,7 +450,7 @@ private fun BanSlotPreview(
         Text(
             text = hero?.cname ?: "${index + 1}",
             color = TextMuted,
-            fontSize = 9.sp,
+            fontSize = 10.sp,
             fontWeight = FontWeight.SemiBold,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -410,7 +499,7 @@ private fun PositionLabelRow(team: List<TeamSlot>) {
             Text(
                 text = slot.positionName,
                 color = TextMuted,
-                fontSize = 10.sp,
+                fontSize = 11.sp,
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -475,7 +564,7 @@ private fun HeroAvatarCard(
             modifier = Modifier
                 .heightIn(max = 55.dp)
                 .aspectRatio(1f)
-                .clip(RoundedCornerShape(4.dp))
+                .clip(RoundedCornerShape(6.dp))
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
@@ -487,7 +576,7 @@ private fun HeroAvatarCard(
                 .border(
                     width = if (comboForHero != null) 2.dp else 1.dp,
                     color = if (comboForHero != null) borderColor.copy(alpha = pulseAlpha.value) else borderColor,
-                    shape = RoundedCornerShape(4.dp)
+                    shape = RoundedCornerShape(6.dp)
                 ),
             contentAlignment = Alignment.Center
         ) {
@@ -512,7 +601,7 @@ private fun HeroAvatarCard(
         Text(
             text = displayName,
             color = if (comboForHero != null) Color(AndroidColor.parseColor(comboForHero.borderColor)) else TextOnDark,
-            fontSize = 11.sp,
+            fontSize = 12.sp,
             fontWeight = if (comboForHero != null) FontWeight.Bold else FontWeight.SemiBold,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -545,7 +634,7 @@ private fun BottomShareBar(
     ) {
         Box {
             Surface(
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(3.dp),
                 color = GoldAccent,
                 shadowElevation = 4.dp,
                 modifier = Modifier
@@ -559,25 +648,37 @@ private fun BottomShareBar(
                         }
                     )
             ) {
-                Row(
+                Box(
                     modifier = Modifier.fillMaxSize(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
+                    contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        imageVector = Icons.Filled.Share,
-                        contentDescription = "分享",
-                        modifier = Modifier.size(18.dp),
-                        tint = Color(0xFF1A1A1A)
+                    Image(
+                        painter = painterResource(id = R.drawable.button),
+                        contentDescription = null,
+                        contentScale = ContentScale.FillBounds,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(3.dp))
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = "分享结果",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = FzmeiheiFont,
-                        color = Color(0xFF1A1A1A)
-                    )
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Share,
+                            contentDescription = "分享",
+                            modifier = Modifier.size(18.dp),
+                            tint = Color(0xFF1A1A1A)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "分享结果",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = FzmeiheiFont,
+                            color = Color(0xFF1A1A1A)
+                        )
+                    }
                 }
             }
 

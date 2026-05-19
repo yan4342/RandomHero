@@ -27,16 +27,15 @@ import androidx.compose.ui.window.DialogProperties
 import com.example.random.data.HeroRepository
 import com.example.random.data.ImagePreloader
 import com.example.random.model.Hero
+import com.example.random.ui.theme.AppColors
+import com.example.random.ui.theme.LocalAppColors
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.LaunchedEffect
 
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.runtime.derivedStateOf
 
@@ -50,9 +49,10 @@ fun HeroSelectorDialog(
     onDismiss: () -> Unit,
     onHeroSelected: (Hero) -> Unit
 ) {
+    val appColors = LocalAppColors.current
     var searchText by remember { mutableStateOf("") }
     var selectedRole by remember { mutableStateOf<Int?>(null) } // null means 'All'
-    
+
     val filteredHeroes = remember(searchText, selectedRole, heroes) {
         var result = heroes
         if (selectedRole != null) {
@@ -65,119 +65,106 @@ fun HeroSelectorDialog(
         }
         result
     }
-    
+
     // 分页状态
     var displayedCount by remember { mutableIntStateOf(PAGE_SIZE) }
     var isLoadingMore by remember { mutableStateOf(false) }
-    
+
     // 当筛选条件变化时重置分页
     LaunchedEffect(searchText, selectedRole) {
         displayedCount = PAGE_SIZE
     }
-    
+
     // 当前显示的英雄列表（分页截取）
     val displayedHeroes = remember(filteredHeroes, displayedCount) {
         filteredHeroes.take(displayedCount)
     }
-    
+
     // 是否还有更多数据
     val hasMore = remember(filteredHeroes, displayedCount) {
         displayedCount < filteredHeroes.size
     }
-    
-    val isDark = isSystemInDarkTheme()
-    val dialogBg = remember(isDark) { if (isDark) Color(0xFF1E1E1E) else Color.White }
-    val textColor = remember(isDark) { if (isDark) Color(0xFFDDDDDD) else Color(0xFF333333) }
-    val divColor = remember(isDark) { if (isDark) Color(0xFF333333) else Color(0xFFEEEEEE) }
-    val inputBg = remember(isDark) { if (isDark) Color(0xFF2C2C2C) else Color(0xFFF5F5F5) }
-    val avatarBg = remember(isDark) { if (isDark) Color(0xFF2C2C2C) else Color(0xFFEEEEEE) }
-    
+
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-    
+
     // 在对话框显示时预加载图片
     LaunchedEffect(Unit) {
         coroutineScope.launch {
-            // 预加载所有英雄的头像
             ImagePreloader.preloadAllHeroAvatars(context)
         }
     }
-    
+
     Dialog(
         onDismissRequest = onDismiss,
-        properties = DialogProperties(usePlatformDefaultWidth = false) // 禁用默认的平台宽度限制，自己控制更精确
+        properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
         Surface(
             modifier = Modifier
-                .fillMaxWidth(0.9f) // 使用固定比例而不是随内容撑开
+                .fillMaxWidth(0.9f)
                 .fillMaxHeight(0.75f),
-            shape = RoundedCornerShape(10.dp),
-            color = dialogBg
+            shape = RoundedCornerShape(16.dp),
+            color = appColors.card
         ) {
             Column(
-                modifier = Modifier.padding(10.dp)
+                modifier = Modifier.padding(16.dp)
             ) {
                 // Header
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 5.dp)
+                        .padding(bottom = 8.dp)
                 ) {
                     Text(
                         "选择禁用英雄",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = textColor,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = appColors.textMain,
                         modifier = Modifier.weight(1f)
                     )
                     IconButton(
                         onClick = onDismiss,
-                        modifier = Modifier.size(30.dp)
+                        modifier = Modifier.size(32.dp)
                     ) {
                         Icon(
                             Icons.Default.Close,
                             contentDescription = "关闭",
-                            tint = Color(0xFF999999)
+                            tint = appColors.textSub
                         )
                     }
                 }
-                
-                HorizontalDivider(color = divColor, thickness = 1.dp)
-                Spacer(modifier = Modifier.height(10.dp))
-                
+
+                HorizontalDivider(color = appColors.divider, thickness = 1.dp)
+                Spacer(modifier = Modifier.height(12.dp))
+
                 // Search Input
                 TextField(
                     value = searchText,
                     onValueChange = { searchText = it },
-                    placeholder = { Text("搜索英雄名称", fontSize = 14.sp, color = Color(0xFF999999)) },
-                    textStyle = TextStyle(fontSize = 14.sp, color = textColor),
+                    placeholder = { Text("搜索英雄名称", style = MaterialTheme.typography.bodyMedium, color = appColors.textSub) },
+                    textStyle = MaterialTheme.typography.bodyMedium.copy(color = appColors.textMain),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp)
-                        .clip(RoundedCornerShape(5.dp)),
+                        .clip(RoundedCornerShape(12.dp)),
                     colors = TextFieldDefaults.colors(
-                        focusedContainerColor = inputBg,
-                        unfocusedContainerColor = inputBg,
-                        disabledContainerColor = inputBg,
+                        focusedContainerColor = appColors.surfaceInput,
+                        unfocusedContainerColor = appColors.surfaceInput,
+                        disabledContainerColor = appColors.surfaceInput,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
-                        cursorColor = textColor
+                        cursorColor = appColors.textMain
                     ),
                     singleLine = true
                 )
-                
-                Spacer(modifier = Modifier.height(10.dp))
-                
+
+                Spacer(modifier = Modifier.height(12.dp))
+
                 // Role Filter Bar
                 val roles = remember {
                     listOf(null to "全部") + Hero.ROLES.toList()
                 }
-                
-                // Cache colors to avoid recreation
-                val selectedBgColor = remember(isDark) { Color(0xFFBCA676) }
-                val selectedTextColor = remember(isDark) { Color(0xFF30210D) }
-                
+
                 LazyRow(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -189,19 +176,19 @@ fun HeroSelectorDialog(
                             roleName = roleName,
                             isSelected = selectedRole == roleId,
                             onSelected = { selectedRole = roleId },
-                            selectedBgColor = selectedBgColor,
-                            selectedTextColor = selectedTextColor,
-                            unselectedBgColor = inputBg,
-                            unselectedTextColor = textColor
+                            selectedBgColor = appColors.gold,
+                            selectedTextColor = appColors.darkText,
+                            unselectedBgColor = appColors.surfaceInput,
+                            unselectedTextColor = appColors.textMain
                         )
                     }
                 }
-                
-                Spacer(modifier = Modifier.height(10.dp))
-                
+
+                Spacer(modifier = Modifier.height(12.dp))
+
                 // Hero Grid with pagination
                 val gridState = rememberLazyGridState()
-                
+
                 // 检测是否需要加载更多
                 val shouldLoadMore by remember {
                     derivedStateOf {
@@ -209,7 +196,7 @@ fun HeroSelectorDialog(
                         lastVisibleItem >= (displayedCount - LOAD_MORE_THRESHOLD) && hasMore && !isLoadingMore
                     }
                 }
-                
+
                 // 触发加载更多
                 LaunchedEffect(shouldLoadMore) {
                     if (shouldLoadMore) {
@@ -218,9 +205,9 @@ fun HeroSelectorDialog(
                         isLoadingMore = false
                     }
                 }
-                
+
                 LazyVerticalGrid(
-                    columns = GridCells.Fixed(5), // 使用固定列数减少计算
+                    columns = GridCells.Fixed(5),
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -230,15 +217,15 @@ fun HeroSelectorDialog(
                     items(
                         items = displayedHeroes,
                         key = { it.ename },
-                        contentType = { "hero" } // 提示 Compose 这里的项类型相同，优化重用
+                        contentType = { "hero" }
                     ) { hero ->
                         HeroGridItem(
                             hero = hero,
                             onClick = { onHeroSelected(hero) },
-                            avatarBg = avatarBg
+                            avatarBg = appColors.avatarBg
                         )
                     }
-                    
+
                     // 底部加载指示器
                     if (isLoadingMore) {
                         item(
@@ -254,7 +241,7 @@ fun HeroSelectorDialog(
                                 CircularProgressIndicator(
                                     modifier = Modifier.size(24.dp),
                                     strokeWidth = 2.dp,
-                                    color = selectedBgColor
+                                    color = appColors.gold
                                 )
                             }
                         }
@@ -275,11 +262,11 @@ fun HeroGridItem(
         HeroRepository.getHeroAvatarUrl(hero.ename)
     }
     val updatedOnClick by rememberUpdatedState(newValue = onClick)
-    
+
     Box(
         modifier = Modifier
             .size(50.dp)
-            .clip(RoundedCornerShape(5.dp))
+            .clip(RoundedCornerShape(8.dp))
             .background(avatarBg)
             .noRippleClickable { updatedOnClick() }
     ) {
@@ -304,20 +291,20 @@ fun RoleFilterItem(
     val bgColor = if (isSelected) selectedBgColor else unselectedBgColor
     val txtColor = if (isSelected) selectedTextColor else unselectedTextColor
     val updatedOnSelected by rememberUpdatedState(newValue = onSelected)
-    
+
     Box(
         modifier = Modifier
-            .clip(RoundedCornerShape(15.dp))
+            .clip(RoundedCornerShape(20.dp))
             .background(bgColor)
             .noRippleClickable(onClick = updatedOnSelected)
-            .padding(horizontal = 12.dp, vertical = 6.dp),
+            .padding(horizontal = 14.dp, vertical = 7.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = roleName,
-            fontSize = 13.sp,
+            style = MaterialTheme.typography.labelMedium,
             color = txtColor,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
         )
     }
 }

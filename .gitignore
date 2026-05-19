@@ -101,4 +101,5 @@ out/
 signing.properties
 keystore.properties
 
+.claude
 plan.md

@@ -14,7 +14,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.random.model.HeroCombo
 import com.example.random.model.TeamSlot
 import com.example.random.ui.theme.*
@@ -34,10 +33,10 @@ fun TeamColumn(
     // 共享动画 - 只创建一次 infiniteTransition
     val infiniteTransition = rememberInfiniteTransition(label = "borderPulse")
     val pulseWidth = infiniteTransition.animateFloat(
-        initialValue = 1f,
-        targetValue = 3f,
+        initialValue = 1.5f,
+        targetValue = 2.5f,
         animationSpec = infiniteRepeatable(
-            animation = tween(1000, easing = LinearEasing),
+            animation = tween(1200, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "pulseWidth"
@@ -45,19 +44,18 @@ fun TeamColumn(
 
     Card(
         colors = CardDefaults.cardColors(containerColor = appColors.card),
-        elevation = CardDefaults.cardElevation(defaultElevation = if (appColors.isDark) 0.dp else 2.dp),
-        shape = RoundedCornerShape(5.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = if (appColors.isDark) 0.dp else 1.dp),
+        shape = appColors.cardShape,
         modifier = modifier
     ) {
         Column(
-            modifier = Modifier.padding(20.dp),
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 title,
                 color = titleColor,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
+                style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(vertical = 5.dp)
             )
 
@@ -101,7 +99,7 @@ fun HeroSlot(
     ) {
         Text(
             slot.positionName,
-            fontSize = 12.sp,
+            style = MaterialTheme.typography.bodySmall,
             color = appColors.textSub,
             modifier = Modifier.padding(bottom = 2.dp)
         )
@@ -109,12 +107,12 @@ fun HeroSlot(
         Box(
             modifier = Modifier
                 .size(50.dp)
-                .clip(RoundedCornerShape(5.dp))
+                .clip(RoundedCornerShape(10.dp))
                 .background(appColors.avatarBg)
                 .border(
                     width = if (comboForHero != null) pulseWidth.dp else 2.dp,
                     color = borderColor,
-                    shape = RoundedCornerShape(5.dp)
+                    shape = RoundedCornerShape(10.dp)
                 )
         ) {
             if (slot.avatarUrl.isNotEmpty()) {
@@ -127,7 +125,7 @@ fun HeroSlot(
 
         Text(
             displayName,
-            fontSize = 14.sp,
+            style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Medium,
             color = appColors.textMain,
             modifier = Modifier.padding(top = 2.dp)
