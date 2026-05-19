@@ -4,8 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.graphics.Bitmap
-import android.graphics.Canvas as AndroidCanvas
 import android.graphics.Color as AndroidColor
 import android.net.Uri
 import android.view.View
@@ -65,7 +63,6 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.FileProvider
 import com.example.random.R
 import com.example.random.data.HeroRepository
 import com.example.random.model.Hero
@@ -74,8 +71,6 @@ import com.example.random.model.ShareResultData
 import com.example.random.model.TeamSlot
 import com.example.random.ui.components.HeroAvatar
 import com.example.random.ui.theme.*
-import java.io.File
-import java.io.FileOutputStream
 
 // ── Main Share Result Screen (横屏布局, 参考 TeamRoomScreen 风格) ──────────────
 
@@ -250,8 +245,8 @@ fun ShareResultScreen(
 
             // ── Bottom Bar: Share Button ──
             BottomShareBar(
-                onCaptureAndShare = { captureAndShare(view, context) },
-                onCaptureAndView = { captureAndView(view, context) }
+                view = view,
+                context = context
             )
         }
 
@@ -618,11 +613,27 @@ private fun HeroAvatarCard(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun BottomShareBar(
-    onCaptureAndShare: () -> Unit,
-    onCaptureAndView: () -> Unit
+    view: View,
+    context: Context
 ) {
     var expanded by remember { mutableStateOf(false) }
     val haptic = LocalHapticFeedback.current
+
+    // 分享底部弹窗状态
+    var showShareSheet by remember { mutableStateOf(false) }
+    var capturedUri by remember { mutableStateOf<Uri?>(null) }
+
+    if (showShareSheet) {
+        ShareBottomSheet(
+            imageUri = capturedUri,
+            isQQInstalled = isAppInstalled(context, PACKAGE_QQ),
+            isWeChatInstalled = isAppInstalled(context, PACKAGE_WECHAT),
+            onShareToQQ = { capturedUri?.let { shareToQQ(context, it) } },
+            onShareToWeChat = { capturedUri?.let { shareToWeChat(context, it) } },
+            onShareToSystem = { capturedUri?.let { shareToSystem(context, it) } },
+            onDismiss = { showShareSheet = false }
+        )
+    }
 
     Row(
         modifier = Modifier
@@ -641,7 +652,11 @@ private fun BottomShareBar(
                     .width(160.dp)
                     .height(40.dp)
                     .combinedClickable(
-                        onClick = { onCaptureAndShare() },
+                        onClick = {
+                            val uri = captureToUri(view, context)
+                            capturedUri = uri
+                            showShareSheet = true
+                        },
                         onLongClick = {
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             expanded = true
@@ -690,14 +705,22 @@ private fun BottomShareBar(
                     text = { Text("查看") },
                     onClick = {
                         expanded = false
-                        onCaptureAndView()
+                        val uri = captureToUri(view, context)
+                        if (uri != null) {
+                            val viewIntent = Intent(Intent.ACTION_VIEW).apply {
+                                setDataAndType(uri, "image/png")
+                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            }
+                            context.startActivity(Intent.createChooser(viewIntent, "查看抽取结果"))
+                        }
                     }
                 )
                 DropdownMenuItem(
                     text = { Text("分享") },
                     onClick = {
                         expanded = false
-                        onCaptureAndShare()
+                        val uri = captureToUri(view, context)
+                        if (uri != null) shareToSystem(context, uri)
                     }
                 )
             }
@@ -742,90 +765,6 @@ private fun LockScreenOrientation(orientation: Int) {
             }
         }
     }
-}
-
-// ── Screenshot Capture & Share ──────────────────────────────────────────────────
-
-private fun captureAndShare(view: View, context: Context) {
-    cleanOldShareFiles(context)
-    val rootView = findSuitableCaptureView(view)
-
-    val bitmap = Bitmap.createBitmap(
-        rootView.width,
-        rootView.height,
-        Bitmap.Config.ARGB_8888
-    )
-    val canvas = AndroidCanvas(bitmap)
-    rootView.draw(canvas)
-
-    val file = File(
-        context.cacheDir,
-        "share_result_${System.currentTimeMillis()}.png"
-    )
-    FileOutputStream(file).use { out ->
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
-    }
-    bitmap.recycle()
-
-    val uri: Uri = FileProvider.getUriForFile(
-        context,
-        "${context.packageName}.fileprovider",
-        file
-    )
-
-    val shareIntent = Intent(Intent.ACTION_SEND).apply {
-        type = "image/png"
-        putExtra(Intent.EXTRA_STREAM, uri)
-        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-    }
-    context.startActivity(Intent.createChooser(shareIntent, "分享抽取结果"))
-}
-
-private fun captureAndView(view: View, context: Context) {
-    cleanOldShareFiles(context)
-    val rootView = findSuitableCaptureView(view)
-
-    val bitmap = Bitmap.createBitmap(
-        rootView.width,
-        rootView.height,
-        Bitmap.Config.ARGB_8888
-    )
-    val canvas = AndroidCanvas(bitmap)
-    rootView.draw(canvas)
-
-    val file = File(
-        context.cacheDir,
-        "share_result_${System.currentTimeMillis()}.png"
-    )
-    FileOutputStream(file).use { out ->
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
-    }
-    bitmap.recycle()
-
-    val uri: Uri = FileProvider.getUriForFile(
-        context,
-        "${context.packageName}.fileprovider",
-        file
-    )
-
-    val viewIntent = Intent(Intent.ACTION_VIEW).apply {
-        setDataAndType(uri, "image/png")
-        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-    }
-    context.startActivity(Intent.createChooser(viewIntent, "查看抽取结果"))
-}
-
-private fun findSuitableCaptureView(view: View): View {
-    var current = view
-    while (current.parent is View) {
-        val parent = current.parent as View
-        if (parent.width > 0 && parent.height > 0) {
-            current = parent
-        } else {
-            break
-        }
-    }
-    return current
 }
 
 // ── Preview ────────────────────────────────────────────────────────────────────

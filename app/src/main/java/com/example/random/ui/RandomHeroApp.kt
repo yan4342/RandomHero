@@ -1,5 +1,6 @@
 package com.example.random.ui
 
+import android.net.Uri
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -38,13 +39,32 @@ fun RandomHeroApp() {
     val haptic = LocalHapticFeedback.current
     val context = LocalContext.current
 
-    // Background capture of ShareResultScreen (no visible transition)
+    // 分享底部弹窗状态（主页快捷分享）
+    var showMainShareSheet by remember { mutableStateOf(false) }
+    var capturedShareUri by remember { mutableStateOf<Uri?>(null) }
+
+    // Background capture of ShareResultScreen → 显示分享底部弹窗
     LaunchedEffect(autoShare) {
         if (autoShare) {
             kotlinx.coroutines.delay(100)
-            captureShareInBackground(context, viewModel.getShareData())
+            val uri = captureShareInBackground(context, viewModel.getShareData())
+            capturedShareUri = uri
             viewModel.closeShareScreen()
+            showMainShareSheet = true
         }
+    }
+
+    // 分享底部弹窗（主页快捷分享）
+    if (showMainShareSheet) {
+        ShareBottomSheet(
+            imageUri = capturedShareUri,
+            isQQInstalled = isAppInstalled(context, PACKAGE_QQ),
+            isWeChatInstalled = isAppInstalled(context, PACKAGE_WECHAT),
+            onShareToQQ = { capturedShareUri?.let { shareToQQ(context, it) } },
+            onShareToWeChat = { capturedShareUri?.let { shareToWeChat(context, it) } },
+            onShareToSystem = { capturedShareUri?.let { shareToSystem(context, it) } },
+            onDismiss = { showMainShareSheet = false }
+        )
     }
 
     // Navigate to settings screen
@@ -145,7 +165,7 @@ fun RandomHeroApp() {
                 // Randomize Button with button.png pattern
                 Button(
                     onClick = { viewModel.randomize() },
-                    shape = RoundedCornerShape(4.dp),
+                    shape = RoundedCornerShape(6.dp),
                     contentPadding = PaddingValues(0.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = appColors.gold,
@@ -165,7 +185,7 @@ fun RandomHeroApp() {
                             contentScale = ContentScale.FillBounds,
                             modifier = Modifier
                                 .fillMaxSize()
-                                .clip(RoundedCornerShape(4.dp))
+                                .clip(RoundedCornerShape(6.dp))
                         )
                         Text(
                             "重新抽取",
