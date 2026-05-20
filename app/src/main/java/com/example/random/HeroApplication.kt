@@ -5,6 +5,7 @@ import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
+import com.example.random.data.AppSettingsRepository
 import com.example.random.data.HeroDataSource
 import com.example.random.data.HeroRepository
 import com.example.random.data.ImagePreloader
@@ -16,6 +17,8 @@ import com.example.random.data.ImagePreloader
 class HeroApplication : Application(), ImageLoaderFactory {
     override fun onCreate() {
         super.onCreate()
+        // 初始化应用设置
+        AppSettingsRepository.init(this)
         // 初始化数据源
         HeroDataSource.init(this)
         // 加载英雄数据到仓库

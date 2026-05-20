@@ -2,7 +2,7 @@
 # 🎲 随机英雄 - 王者荣耀随机选将工具
 
 一款基于 Jetpack Compose 的 Android 应用，用于在王者荣耀5v5开房间开黑前随机分配英雄阵容，支持按位置智能匹配、Ban 位排除和结果分享。
-
+项目使用ai生成。
 ## ✨ 功能特性
 
 ### 🎮 两种游戏模式
@@ -13,20 +13,20 @@
 - 支持最多 **8 个 Ban 位**
 - 点击 Ban 位可打开英雄选择器，支持搜索
 - 已 Ban 的英雄不会出现在随机结果中
-  ![Screenshot_20260515_224006.png](assets/Screenshot_20260515_224006.png)
+![Screenshot_20260520_222351.png](assets/Screenshot_20260520_222351.png)
 
 ### 🔄 重新Roll点
 - 对随机结果不满意？可以单独重新 Roll 某一个位置的英雄
-![Screenshot_20260515_223928.png](assets/Screenshot_20260515_223928.png)
+![首页.png](assets/%E9%A6%96%E9%A1%B5.png)
 
 ### 📸 结果分享
 - 一键生成精美的阵容结果图，长按分享按钮进入分享页
 - 支持直接分享到社交应用
-![Screenshot_20260515_224052.png](assets/Screenshot_20260515_224052.png)
+![分享页.png](assets/%E5%88%86%E4%BA%AB%E9%A1%B5.png)
 
 ### 设置页
-- 自定义英雄分路配置，新增英雄
-![Screenshot_20260515_224026.png](assets/Screenshot_20260515_224026.png)
+- 自定义英雄分路配置，新增英雄，自定义配色
+![设置页.png](assets/%E8%AE%BE%E7%BD%AE%E9%A1%B5.png)
 
 ### 🌙 深色模式
 - 自动跟随系统深色/浅色主题

@@ -7,7 +7,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import com.example.random.data.AppSettingsRepository
 import com.example.random.ui.RandomHeroApp
 import com.example.random.ui.theme.RandomTheme
 
@@ -21,7 +24,9 @@ class MainActivity : ComponentActivity() {
         
         super.onCreate(savedInstanceState)
         setContent {
-            RandomTheme {
+            val themeColors by AppSettingsRepository.themeColors.collectAsState()
+
+            RandomTheme(themeColors = themeColors) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background

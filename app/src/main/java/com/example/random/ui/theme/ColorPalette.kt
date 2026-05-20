@@ -9,7 +9,7 @@ import com.example.random.R
 val FzmeiheiFont = FontFamily(Font(R.font.fzmhsubset))
 
 // ── 浅色主题颜色 (RandomHeroApp 主界面) ─────────────────────────────────────
-val BgColor = Color(0xFFF5F5F5)
+val BgColor = Color(0xFFF1EDE5)
 val CardColor = Color.White
 val GoldColor = Color(0xFFBCA676)
 val TextColor = Color(0xFF333333)

@@ -29,7 +29,9 @@ fun BanSection(viewModel: RandomHeroViewModel, activeCombos: List<HeroCombo> = e
 
     Card(
         colors = CardDefaults.cardColors(containerColor = appColors.card),
-        elevation = CardDefaults.cardElevation(defaultElevation = if (appColors.isDark) 0.dp else 1.dp),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 0.dp
+        ),
         shape = appColors.cardShape,
         modifier = Modifier.fillMaxWidth()
     ) {

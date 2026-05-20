@@ -6,7 +6,9 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.unit.dp
+import com.example.random.model.ThemeColorSettings
 
 @Immutable
 data class AppColors(
@@ -72,3 +74,22 @@ val AppColors.current: AppColors
     @Composable
     @ReadOnlyComposable
     get() = LocalAppColors.current
+
+fun AppColors.withThemeColors(themeColors: ThemeColorSettings): AppColors {
+    val accent = Color(themeColors.accentColor)
+    val customCard = themeColors.cardColor?.let(::Color)
+
+    return copy(
+        bg = themeColors.backgroundColor?.let(::Color) ?: bg,
+        card = customCard ?: card,
+        gold = accent,
+        teamA = Color(themeColors.teamAColor),
+        teamB = Color(themeColors.teamBColor),
+        darkText = contentColorFor(accent),
+        surfaceElevated = customCard ?: surfaceElevated
+    )
+}
+
+fun contentColorFor(background: Color): Color {
+    return if (background.luminance() > 0.5f) Color.Black else Color.White
+}

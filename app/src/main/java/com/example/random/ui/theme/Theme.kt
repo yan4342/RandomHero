@@ -7,44 +7,47 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
+import com.example.random.model.ThemeColorSettings
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Color(0xFFBCA676),
-    secondary = Color(0xFF30210D),
-    tertiary = Color(0xFF888888),
-    background = DarkBgColor,
-    surface = SurfaceElevatedDark,
-    onPrimary = Color.Black,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color.White,
-    onSurface = Color.White
+private fun darkColorSchemeFor(themeColors: ThemeColorSettings) = darkColorScheme(
+    primary = Color(themeColors.accentColor),
+    secondary = Color(themeColors.teamAColor),
+    tertiary = Color(themeColors.teamBColor),
+    background = themeColors.backgroundColor?.let(::Color) ?: DarkBgColor,
+    surface = themeColors.cardColor?.let(::Color) ?: SurfaceElevatedDark,
+    onPrimary = contentColorFor(Color(themeColors.accentColor)),
+    onSecondary = contentColorFor(Color(themeColors.teamAColor)),
+    onTertiary = contentColorFor(Color(themeColors.teamBColor)),
+    onBackground = contentColorFor(themeColors.backgroundColor?.let(::Color) ?: DarkBgColor),
+    onSurface = contentColorFor(themeColors.cardColor?.let(::Color) ?: SurfaceElevatedDark)
 )
 
-private val LightColorScheme = lightColorScheme(
-    primary = Color(0xFFBCA676),
-    secondary = Color(0xFF30210D),
-    tertiary = Color(0xFF888888),
-    background = BgColor,
-    surface = SurfaceElevatedLight,
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color.Black,
-    onSurface = Color.Black
+private fun lightColorSchemeFor(themeColors: ThemeColorSettings) = lightColorScheme(
+    primary = Color(themeColors.accentColor),
+    secondary = Color(themeColors.teamAColor),
+    tertiary = Color(themeColors.teamBColor),
+    background = themeColors.backgroundColor?.let(::Color) ?: BgColor,
+    surface = themeColors.cardColor?.let(::Color) ?: SurfaceElevatedLight,
+    onPrimary = contentColorFor(Color(themeColors.accentColor)),
+    onSecondary = contentColorFor(Color(themeColors.teamAColor)),
+    onTertiary = contentColorFor(Color(themeColors.teamBColor)),
+    onBackground = contentColorFor(themeColors.backgroundColor?.let(::Color) ?: BgColor),
+    onSurface = contentColorFor(themeColors.cardColor?.let(::Color) ?: SurfaceElevatedLight)
 )
 
 @Composable
 fun RandomTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
+    themeColors: ThemeColorSettings = ThemeColorSettings.Default,
     content: @Composable () -> Unit
 ) {
     val colorScheme = if (darkTheme) {
-        DarkColorScheme
+        darkColorSchemeFor(themeColors)
     } else {
-        LightColorScheme
+        lightColorSchemeFor(themeColors)
     }
-    val appColors = if (darkTheme) DarkAppColors else LightAppColors
+    val appColors = (if (darkTheme) DarkAppColors else LightAppColors)
+        .withThemeColors(themeColors)
 
     CompositionLocalProvider(LocalAppColors provides appColors) {
         MaterialTheme(

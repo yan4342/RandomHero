@@ -41,7 +41,8 @@ object ImagePreloader {
             try {
                 val request = ImageRequest.Builder(context)
                     .data(imageUrl)
-                    // 不指定尺寸，加载原始尺寸以匹配各种显示场景
+                    .memoryCacheKey(imageUrl) // 固定缓存 key，与 HeroAvatar 共享缓存
+                    .diskCacheKey(imageUrl)
                     .build()
                 
                 getImageLoader().enqueue(request)
@@ -61,7 +62,8 @@ object ImagePreloader {
                     val imageUrl = HeroRepository.getHeroAvatarUrl(ename)
                     val request = ImageRequest.Builder(context)
                         .data(imageUrl)
-                        // 不指定尺寸，加载原始尺寸以匹配各种显示场景
+                        .memoryCacheKey(imageUrl) // 固定缓存 key，与 HeroAvatar 共享缓存
+                        .diskCacheKey(imageUrl)
                         .build()
                     
                     getImageLoader().enqueue(request)

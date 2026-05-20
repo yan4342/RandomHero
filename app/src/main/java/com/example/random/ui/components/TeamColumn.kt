@@ -44,8 +44,9 @@ fun TeamColumn(
 
     Card(
         colors = CardDefaults.cardColors(containerColor = appColors.card),
-        elevation = CardDefaults.cardElevation(defaultElevation = if (appColors.isDark) 0.dp else 1.dp),
-        shape = appColors.cardShape,
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 0.dp
+        ),
         modifier = modifier
     ) {
         Column(

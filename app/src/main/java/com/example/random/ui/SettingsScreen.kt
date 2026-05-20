@@ -1,5 +1,8 @@
 package com.example.random.ui
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,12 +23,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.activity.compose.BackHandler
+import com.example.random.BuildConfig
 import com.example.random.R
+import com.example.random.data.AppSettingsRepository
+import com.example.random.data.GitHubUpdateChecker
 import com.example.random.data.HeroDataSource
 import com.example.random.data.HeroRepository
+import com.example.random.data.UpdateCheckResult
 import com.example.random.model.Hero
 import com.example.random.ui.components.HeroSelectorDialog
 import com.example.random.ui.theme.*
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,6 +42,8 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
     val appColors = LocalAppColors.current
+    val themeColors by AppSettingsRepository.themeColors.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
     
     // 手势返回处理
     BackHandler { onBackClick() }
@@ -53,6 +63,34 @@ fun SettingsScreen(
 
     // 恢复默认确认弹窗
     var showResetConfirm by remember { mutableStateOf(false) }
+
+    // 外观颜色弹窗
+    var showAppearanceDialog by remember { mutableStateOf(false) }
+
+    // 颜色自定义弹窗
+    var customColorTarget by remember { mutableStateOf<ThemeColorTarget?>(null) }
+
+    // GitHub 更新检查
+    var isCheckingUpdate by remember { mutableStateOf(false) }
+    var updateResult by remember { mutableStateOf<UpdateCheckResult?>(null) }
+
+    fun saveThemeColor(target: ThemeColorTarget, color: Int) {
+        AppSettingsRepository.updateThemeColors(
+            accentColor = if (target == ThemeColorTarget.Accent) color else themeColors.accentColor,
+            teamAColor = if (target == ThemeColorTarget.TeamA) color else themeColors.teamAColor,
+            teamBColor = if (target == ThemeColorTarget.TeamB) color else themeColors.teamBColor,
+            backgroundColor = if (target == ThemeColorTarget.Background) color else themeColors.backgroundColor,
+            cardColor = if (target == ThemeColorTarget.Card) color else themeColors.cardColor
+        )
+    }
+
+    fun openUrl(url: String) {
+        try {
+            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+        } catch (_: ActivityNotFoundException) {
+            Toast.makeText(context, "无法打开链接", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     // 导入/导出
     val exportLauncher = rememberLauncherForActivityResult(
@@ -116,12 +154,17 @@ fun SettingsScreen(
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            AppearanceColorCard(
+                themeColors = themeColors,
+                onClick = { showAppearanceDialog = true }
+            )
+
             // ── 主操作卡片：选择英雄 ──────────────────────────────────────
             Card(
                 colors = CardDefaults.cardColors(containerColor = appColors.card),
                 shape = appColors.cardShape,
                 elevation = CardDefaults.cardElevation(
-                    defaultElevation = if (appColors.isDark) 0.dp else 1.dp
+                    defaultElevation = 0.dp
                 ),
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -239,6 +282,21 @@ fun SettingsScreen(
                 }
             }
 
+            GitHubUpdateCard(
+                currentVersion = BuildConfig.VERSION_NAME,
+                isChecking = isCheckingUpdate,
+                onOpenRepository = { openUrl(GitHubUpdateChecker.REPOSITORY_URL) },
+                onCheckUpdate = {
+                    if (!isCheckingUpdate) {
+                        isCheckingUpdate = true
+                        coroutineScope.launch {
+                            updateResult = GitHubUpdateChecker.checkForUpdates(BuildConfig.VERSION_NAME)
+                            isCheckingUpdate = false
+                        }
+                    }
+                }
+            )
+
             // ── 预留扩展空间 ──────────────────────────────────────────────
             // 未来可在此处添加更多设置卡片
 
@@ -290,6 +348,46 @@ fun SettingsScreen(
                 heroes = HeroRepository.heroList
                 showAddDialog = false
                 Toast.makeText(context, "已添加", Toast.LENGTH_SHORT).show()
+            }
+        )
+    }
+
+    if (showAppearanceDialog) {
+        AppearanceColorDialog(
+            themeColors = themeColors,
+            onPresetSelected = { target, color ->
+                saveThemeColor(target, color)
+                Toast.makeText(context, "颜色已保存", Toast.LENGTH_SHORT).show()
+            },
+            onCustomClick = { target -> customColorTarget = target },
+            onReset = {
+                AppSettingsRepository.resetThemeColors()
+                Toast.makeText(context, "已恢复默认颜色", Toast.LENGTH_SHORT).show()
+            },
+            onDismiss = { showAppearanceDialog = false }
+        )
+    }
+
+    customColorTarget?.let { target ->
+        CustomColorDialog(
+            target = target,
+            initialColor = themeColors.colorFor(target, appColors),
+            onDismiss = { customColorTarget = null },
+            onSave = { color ->
+                saveThemeColor(target, color)
+                customColorTarget = null
+                Toast.makeText(context, "颜色已保存", Toast.LENGTH_SHORT).show()
+            }
+        )
+    }
+
+    updateResult?.let { result ->
+        UpdateResultDialog(
+            result = result,
+            onDismiss = { updateResult = null },
+            onOpenRelease = { url ->
+                updateResult = null
+                openUrl(url)
             }
         )
     }

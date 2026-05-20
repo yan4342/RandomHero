@@ -30,6 +30,8 @@ fun HeroAvatar(
         ImageRequest.Builder(context)
             .data(imageUrl)
             .crossfade(true)
+            .memoryCacheKey(imageUrl) // 固定缓存 key，与 ImagePreloader 共享缓存
+            .diskCacheKey(imageUrl)
             .allowHardware(false)
             // 保持 allowHardware(false)：分享截图使用软件 Canvas，硬件 Bitmap 会导致崩溃
             .build()
