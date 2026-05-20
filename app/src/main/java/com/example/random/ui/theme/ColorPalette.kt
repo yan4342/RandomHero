@@ -6,7 +6,7 @@ import androidx.compose.ui.text.font.FontFamily
 import com.example.random.R
 
 // ── FzmeiheiFont (统一字体定义) ─────────────────────────────────────────────
-val FzmeiheiFont = FontFamily(Font(R.font.fzmh-subset))
+val FzmeiheiFont = FontFamily(Font(R.font.fzmhsubset))
 
 // ── 浅色主题颜色 (RandomHeroApp 主界面) ─────────────────────────────────────
 val BgColor = Color(0xFFF5F5F5)

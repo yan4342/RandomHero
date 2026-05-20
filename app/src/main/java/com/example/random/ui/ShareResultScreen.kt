@@ -222,7 +222,6 @@ fun ShareResultScreen(
                                 text = "5v5 英雄抽取",
                                 color = TextOnDark,
                                 fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold,
                                 fontFamily = FzmeiheiFont,
                             )
                             Spacer(modifier = Modifier.height(2.dp))
@@ -352,7 +351,7 @@ private fun BanCollapsedTab(
                 text = "Ban位",
                 color = TextOnDark,
                 fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.SemiBold,
                 fontFamily = FzmeiheiFont,
             )
         }

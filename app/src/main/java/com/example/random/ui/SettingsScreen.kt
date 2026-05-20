@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.activity.compose.BackHandler
 import com.example.random.R
 import com.example.random.data.HeroDataSource
 import com.example.random.data.HeroRepository
@@ -33,6 +34,9 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
     val appColors = LocalAppColors.current
+    
+    // 手势返回处理
+    BackHandler { onBackClick() }
 
     // 英雄列表状态
     var heroes by remember { mutableStateOf(HeroRepository.heroList) }

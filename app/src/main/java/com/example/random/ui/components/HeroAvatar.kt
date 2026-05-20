@@ -30,8 +30,8 @@ fun HeroAvatar(
         ImageRequest.Builder(context)
             .data(imageUrl)
             .crossfade(true)
-            // 移除 allowHardware(false)，使用默认的硬件加速以提高性能
-            // 全局 ImageLoader 已配置缓存，这里无需额外设置
+            .allowHardware(false)
+            // 保持 allowHardware(false)：分享截图使用软件 Canvas，硬件 Bitmap 会导致崩溃
             .build()
     }
 

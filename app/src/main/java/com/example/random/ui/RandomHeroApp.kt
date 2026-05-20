@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.random.R
 import com.example.random.ui.components.*
+import com.example.random.ui.components.noRippleClickable
 import com.example.random.ui.theme.*
 import com.example.random.viewmodel.RandomHeroViewModel
 
