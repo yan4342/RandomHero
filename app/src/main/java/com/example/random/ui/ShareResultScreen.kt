@@ -223,6 +223,7 @@ fun ShareResultScreen(
                                 color = TextOnDark,
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
+                                fontFamily = FzmeiheiFont,
                             )
                             Spacer(modifier = Modifier.height(2.dp))
 
@@ -352,6 +353,7 @@ private fun BanCollapsedTab(
                 color = TextOnDark,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold
+                fontFamily = FzmeiheiFont,
             )
         }
     }
@@ -442,16 +444,16 @@ private fun BanSlotPreview(
 
         Spacer(modifier = Modifier.height(4.dp))
 
-        Text(
-            text = hero?.cname ?: "${index + 1}",
-            color = TextMuted,
-            fontSize = 10.sp,
-            fontWeight = FontWeight.SemiBold,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
-        )
+//        Text(
+//            text = hero?.cname ?: "${index + 1}",
+//            color = TextMuted,
+//            fontSize = 10.sp,
+//            fontWeight = FontWeight.SemiBold,
+//            maxLines = 1,
+//            overflow = TextOverflow.Ellipsis,
+//            textAlign = TextAlign.Center,
+//            modifier = Modifier.fillMaxWidth()
+//        )
     }
 }
 

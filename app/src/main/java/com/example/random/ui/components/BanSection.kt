@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
+//import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.random.data.HeroRepository
@@ -129,13 +129,13 @@ fun BanSlot(
             }
         }
 
-        Text(
-            text = displayName,
-            style = MaterialTheme.typography.labelSmall,
-            color = appColors.textSub,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(top = 2.dp)
-        )
+//        Text(
+//            text = displayName,
+//            style = MaterialTheme.typography.labelSmall,
+//            color = appColors.textSub,
+//            maxLines = 1,
+//            overflow = TextOverflow.Ellipsis,
+//            modifier = Modifier.padding(top = 2.dp)
+//        )
     }
 }

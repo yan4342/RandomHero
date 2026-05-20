@@ -12,7 +12,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Search
+//import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,7 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+//import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.random.data.HeroRepository
@@ -40,8 +40,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.runtime.derivedStateOf
 
 // 分页配置
-private const val PAGE_SIZE = 35 // 每页加载数量
-private const val LOAD_MORE_THRESHOLD = 6 // 距离底部多少项时触发加载
+private const val PAGE_SIZE = 40 // 每页加载数量
+private const val LOAD_MORE_THRESHOLD = 11 // 距离底部多少项时触发加载
 
 @Composable
 fun HeroSelectorDialog(

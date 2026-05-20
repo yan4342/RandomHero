@@ -2,7 +2,7 @@ package com.example.random.ui.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.size
+//import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -30,7 +30,8 @@ fun HeroAvatar(
         ImageRequest.Builder(context)
             .data(imageUrl)
             .crossfade(true)
-            .allowHardware(false)
+            // 移除 allowHardware(false)，使用默认的硬件加速以提高性能
+            // 全局 ImageLoader 已配置缓存，这里无需额外设置
             .build()
     }
 

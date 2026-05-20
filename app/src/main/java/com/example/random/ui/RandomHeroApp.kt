@@ -94,6 +94,7 @@ fun RandomHeroApp() {
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
+                .statusBarsPadding()
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -165,14 +166,14 @@ fun RandomHeroApp() {
                 // Randomize Button with button.png pattern
                 Button(
                     onClick = { viewModel.randomize() },
-                    shape = RoundedCornerShape(6.dp),
+                    shape = RoundedCornerShape(8.dp),
                     contentPadding = PaddingValues(0.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = appColors.gold,
                         contentColor = appColors.darkText
                     ),
                     modifier = Modifier
-                        .weight(1f)
+                        .fillMaxWidth(0.8f)
                         .height(48.dp)
                 ) {
                     Box(
@@ -185,7 +186,7 @@ fun RandomHeroApp() {
                             contentScale = ContentScale.FillBounds,
                             modifier = Modifier
                                 .fillMaxSize()
-                                .clip(RoundedCornerShape(6.dp))
+                                .clip(RoundedCornerShape(8.dp))
                         )
                         Text(
                             "重新抽取",

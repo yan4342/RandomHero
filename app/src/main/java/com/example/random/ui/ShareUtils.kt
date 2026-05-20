@@ -35,8 +35,22 @@ fun shareToApp(context: Context, uri: Uri, packageName: String) {
     val intent = Intent(Intent.ACTION_SEND).apply {
         type = "image/png"
         putExtra(Intent.EXTRA_STREAM, uri)
-        `package` = packageName
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+    // 显式指定目标 Activity Component，避免系统再弹选择器
+    val resolveInfo = context.packageManager.resolveActivity(intent, 0)
+    val matched = resolveInfo?.activityInfo
+    if (matched != null && matched.packageName == packageName) {
+        intent.setClassName(matched.packageName, matched.name)
+    } else {
+        // fallback: 查询所有可处理的 Activity，找目标包名
+        val candidates = context.packageManager.queryIntentActivities(intent, 0)
+        val target = candidates.firstOrNull { it.activityInfo.packageName == packageName }
+        if (target != null) {
+            intent.setClassName(target.activityInfo.packageName, target.activityInfo.name)
+        } else {
+            intent.`package` = packageName
+        }
     }
     try {
         context.startActivity(intent)
